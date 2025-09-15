@@ -1,3 +1,5 @@
+USER = $(shell whoami)
+
 DOCKER_COMPOSE=docker compose
 
 DOCKER_COMPOSE_FILE = ./srcs/docker-compose.yml
@@ -5,8 +7,8 @@ DOCKER_COMPOSE_FILE = ./srcs/docker-compose.yml
 .PHONY: kill build down clean restart
 
 build:
-	mkdir -p /home/aouhadou/data/mysql
-	mkdir -p /home/aouhadou/data/wordpress
+	mkdir -p /home/$(USER)/data/mysql
+	mkdir -p /home/$(USER)/data/wordpress
 	@$(DOCKER_COMPOSE)  -f $(DOCKER_COMPOSE_FILE) up --build -d
 
 kill:
@@ -20,8 +22,8 @@ clean:
 	
 
 fclean: clean
-	rm -r /home/aouhadou/data/mysql
-	rm -r /home/aouhadou/data/wordpress
+	rm -rf /home/$(USER)/data/mysql
+	rm -rf /home/$(USER)/data/wordpress
 	docker system prune -a -f
 
 restart: clean build
