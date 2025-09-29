@@ -1,0 +1,14 @@
+
+services:
+  web:
+    build: requirements/nginx/
+    container_name: nginx
+    
+  db:
+    build: requirements/mariadb/
+    container_name: mariadb
+
+  app:
+    build: requirements/wordpress/
+    container_name: wordpress
+    
