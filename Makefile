@@ -9,7 +9,7 @@ DOCKER_COMPOSE_FILE = ./srcs/docker-compose.yml
 build:
 	mkdir -p /home/$(USER)/data/mysql
 	mkdir -p /home/$(USER)/data/wordpress
-	@$(DOCKER_COMPOSE)  -f $(DOCKER_COMPOSE_FILE) up --build -d
+	@$(D@$(DOCKER_COMPOSE_FILE) up --build -d
 
 kill:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) kill
@@ -19,7 +19,6 @@ down:
 
 clean:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down -v
-	
 
 fclean: clean
 	docker run --rm -v /home/$(USER)/data:/data debian rm -rf /data/mysql /data/wordpress
