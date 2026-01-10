@@ -9,7 +9,7 @@ DOCKER_COMPOSE_FILE = ./srcs/docker-compose.yml
 build:
 	mkdir -p /home/$(USER)/data/mysql
 	mkdir -p /home/$(USER)/data/wordpress
-	@$(D@$(DOCKER_COMPOSE_FILE) up --build -d
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up --build -d
 
 kill:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) kill
