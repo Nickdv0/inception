@@ -10,6 +10,5 @@ EXPOSE 9000
 COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 COPY ./tools/init-wp.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/init-wp.sh
-CMD ["/usr/local/bin/init-wp.sh"]
-VOLUME /var/www/html
 RUN chown -R www-data:www-data /var/www/html
+CMD ["/usr/local/bin/init-wp.sh"]
