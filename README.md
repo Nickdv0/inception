@@ -45,8 +45,6 @@ AI tools used for:
 - NGINX SSL/TLS setup
 - Documentation structure
 
-All content was reviewed and tested.
-
 ## Project Description
 
 ### Services

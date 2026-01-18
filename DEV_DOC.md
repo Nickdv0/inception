@@ -112,14 +112,3 @@ docker exec wordpress ping mariadb
 ```bash
 docker exec mariadb mysql -u wpuser -p<password> -e "SHOW DATABASES;"
 ```
-
-## Requirements
-- 3 containers (nginx, wordpress, mariadb)
-- Custom Dockerfiles (Debian 11)
-- No "latest" tags (version 1.0)
-- TLSv1.2/1.3 only
-- Named volumes
-- Bridge network
-- Restart policy: always
-- Environment variables
-- Domain: login.42.fr format
