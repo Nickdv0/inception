@@ -1,6 +1,7 @@
 services:
   web:
     build: requirements/nginx/
+    image: inception-nginx:1.0
     container_name: nginx
     ports:
       - "80:80"
@@ -9,9 +10,11 @@ services:
       - wordpress_vol:/var/www/html
     networks:
       - inception
-    
+    restart: always
+
   db:
     build: requirements/mariadb/
+    image: inception-mariadb:1.0
     container_name: mariadb
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -22,10 +25,11 @@ services:
       - mariadb_vol:/var/lib/mysql
     networks:
       - inception
-
+    restart: always
 
   app:
     build: requirements/wordpress/
+    image: inception-wordpress:1.0
     container_name: wordpress
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -33,25 +37,26 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_HOST=mariadb
     volumes:
-      - wordpress_vol:/var/www/html  
+      - wordpress_vol:/var/www/html
     networks:
       - inception
-
+    restart: always
+    depends_on:
+      - db
 
 volumes:
   mariadb_vol:
     driver: local
     driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '/home/${USER}/data/mysql'
+      type: "none"
+      o: "bind"
+      device: "/home/${USER}/data/mysql"
   wordpress_vol:
     driver: local
     driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '/home/${USER}/data/wordpress'
-
+      type: "none"
+      o: "bind"
+      device: "/home/${USER}/data/wordpress"
 
 networks:
   inception:

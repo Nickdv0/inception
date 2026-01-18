@@ -1,9 +1,10 @@
 FROM debian:11
 RUN apt-get update && apt-get install -y wget php php-fpm php-mysql mariadb-client
 RUN mkdir -p /var/www/html && \
-    wget https://wordpress.org/latest.tar.gz && \
-    tar -xvzf latest.tar.gz && \
-    cp -r wordpress/* /var/www/html/
+	wget https://wordpress.org/latest.tar.gz && \
+	tar -xvzf latest.tar.gz && \
+	cp -r wordpress/* /var/www/html/ && \
+	rm -rf latest.tar.gz wordpress
 RUN mkdir -p /run/php
 EXPOSE 9000
 
