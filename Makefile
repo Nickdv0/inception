@@ -24,4 +24,4 @@ fclean: clean
 	docker run --rm -v /home/$(USER)/data:/data debian rm -rf /data/mysql /data/wordpress
 	docker system prune -a -f
 
-restart: clean build
+re: clean build
