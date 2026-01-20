@@ -3,112 +3,143 @@
 ## Setup
 
 ### Prerequisites
-- Docker
-- Docker Compose
-- Make
-
-### Environment
-Create `srcs/.env`:
-```
-DOMAIN_NAME=nde-vant.42.fr
-MYSQL_ROOT_PASSWORD=rootpass
-MYSQL_DATABASE=wordpress
-MYSQL_USER=wpuser
-MYSQL_PASSWORD=wppass
-USER=croseinos
-```
-
-### Build
 ```bash
-make build
+# Install required tools
+docker --version
+docker compose version
+make --version
 ```
+
+### Quick Start
+```bash
+# 1. Configure domain
+sudo sh -c 'echo "127.0.0.1 nde-vant.42.fr" >> /etc/hosts'
+
+# 2. Fill secrets
+# Edit: secrets/db_password.txt
+# Edit: secrets/db_root_password.txt
+# Edit: secrets/.env
+
+# 3. Build and run
+make
+```
+
+---
 
 ## Architecture
 
-### Services
-- **NGINX** (port 443): TLSv1.2/1.3, reverse proxy
-- **WordPress** (port 9000): PHP-FPM
-- **MariaDB** (port 3306): Database
+**3 Containers:**
+- NGINX (443) → WordPress (9000) → MariaDB (3306)
+- Network: inception (bridge)
+- Volumes: ~/data/mysql, ~/data/wordpress
 
-### Network
-- Bridge: `srcs_inception`
-- DNS resolution: wordpress → mariadb
+**Data Flow:**
+```
+User → NGINX (HTTPS) → WordPress (FastCGI) → MariaDB (MySQL)
+```
 
-### Volumes
-- `srcs_mariadb_vol` → `/home/croseinos/data/mysql`
-- `srcs_wordpress_vol` → `/home/croseinos/data/wordpress`
-
-## Dockerfiles
-
-**NGINX:**
-- Base: Debian 11
-- SSL self-signed cert
-- Run: `nginx -g "daemon off;"`
-
-**WordPress:**
-- Base: Debian 11
-- PHP-FPM + WordPress
-- Run: `php-fpm7.4 -F`
-
-**MariaDB:**
-- Base: Debian 11
-- Database setup
-- Run: `mysqld_safe`
+---
 
 ## Commands
 
-### Makefile
+### Basic
 ```bash
-make build    # Build and start
-make down     # Stop
-make clean    # Remove volumes
-make fclean   # Full cleanup
-make restart  # Rebuild
+make              # Build and start
+make down         # Stop
+make clean        # Stop + remove volumes
+make fclean       # Complete cleanup
+make re           # Rebuild from scratch
 ```
 
-### Docker
+### Docker Compose
 ```bash
-docker ps
-docker logs <container>
-docker exec -it <container> /bin/sh
-docker images | grep inception
+docker compose -f srcs/docker-compose.yml up -d
+docker compose -f srcs/docker-compose.yml down
+docker compose -f srcs/docker-compose.yml logs -f
+docker compose -f srcs/docker-compose.yml ps
 ```
 
-### Verification
+### Inspect Containers
 ```bash
-# Check restart policy
+docker ps                           # List running
+docker logs nginx                   # View logs
+docker logs -f wordpress            # Follow logs
+docker exec -it mariadb bash        # Shell access
+```
+
+---
+
+## Testing
+
+### Check Status
+```bash
+docker ps                           # All should be "Up"
+curl -k https://nde-vant.42.fr      # Test website
+```
+
+### Verify Requirements
+```bash
+# Auto-restart
 docker inspect nginx --format='{{.HostConfig.RestartPolicy.Name}}'
 
-# Check SSL cert
-docker exec nginx openssl x509 -in /etc/ssl/certs/nginx-selfsigned.crt -noout -subject
+# TLS version
+docker exec nginx nginx -V 2>&1 | grep -i tls
 
-# Check volumes
-docker volume ls
+# Network
+docker network inspect inception
 
-# Check network
-docker network ls | grep inception
+# Volumes
+docker volume ls | grep -E "mariadb|wordpress"
 ```
 
-## Data Location
-- MySQL: `/home/croseinos/data/mysql/`
-- WordPress: `/home/croseinos/data/wordpress/`
+### Test Database
+```bash
+# From WordPress container
+docker exec wordpress mysqladmin ping -h mariadb -u wpuser -p
+
+# Connect to MySQL
+docker exec -it mariadb mysql -u root -p
+# Show databases, check wordpress exists
+```
+
+### Test NGINX
+```bash
+docker exec nginx nginx -t          # Test config
+docker exec nginx ls /var/www/html  # Check WordPress files
+```
+
+---
 
 ## Debugging
 
-### Logs
 ```bash
+# View logs
 docker logs nginx
 docker logs wordpress
 docker logs mariadb
-```
 
-### Network
-```bash
-docker network inspect srcs_inception
+# Check if containers are running
+docker ps -a
+
+# Restart specific service
+docker restart nginx
+
+# Access container
+docker exec -it wordpress bash
+
+# Check network connectivity
 docker exec wordpress ping mariadb
 ```
 
-### Database
-```bash
-docker exec mariadb mysql -u wpuser -p<password> -e "SHOW DATABASES;"
-```
+---
+
+## File Locations
+
+**Host:**
+- ~/data/mysql → MariaDB data
+- ~/data/wordpress → WordPress files
+
+**Container paths:**
+- NGINX: /var/www/html, /etc/nginx/nginx.conf
+- WordPress: /var/www/html, /run/secrets/db_password
+- MariaDB: /var/lib/mysql, /run/secrets/

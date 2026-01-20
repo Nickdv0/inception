@@ -4,72 +4,72 @@
 
 ## Description
 
-System administration project using Docker to set up NGINX, WordPress, and MariaDB in separate containers.
+Docker-based infrastructure with NGINX, WordPress, and MariaDB in separate containers.
 
-**Goal**: Create a multi-container infrastructure with Docker Compose.
+**Services:** NGINX (web server) → WordPress (PHP application) → MariaDB (database)
+
+---
 
 ## Instructions
 
 ### Build and Run
 ```bash
-make build
+make
 ```
+
+### Access
+https://nde-vant.42.fr (or https://localhost)
 
 ### Stop
 ```bash
 make down
 ```
 
-### Access
-- https://localhost or https://nde-vant.42.fr
-- Admin panel: /wp-admin
+---
 
-### Hosts File
-Add to `/etc/hosts` (Linux/Mac) or `C:\Windows\System32\drivers\etc\hosts` (Windows):
-```
-127.0.0.1 nde-vant.42.fr
-```
+## Requirements Met
+
+- ✅ NGINX with TLSv1.2/1.3 only (port 443)
+- ✅ WordPress + PHP-FPM (no NGINX in container)
+- ✅ MariaDB (separate container)
+- ✅ Two volumes (database, WordPress files)
+- ✅ Docker network for container communication
+- ✅ Auto-restart on crash
+- ✅ Custom Dockerfiles (no pre-built images)
+- ✅ Environment variables (no hardcoded passwords)
+
+---
+
+## Architecture
+
+**Virtual Machines vs Docker:**
+- Docker: Lightweight, shares kernel, fast startup
+- VMs: Heavy, full OS, slow startup
+- **Choice:** Docker for efficiency
+
+**Secrets vs Environment Variables:**
+- Secrets: More secure, encrypted (in /run/secrets/)
+- Env vars: Simpler, visible in docker inspect
+- **Choice:** Secrets for passwords, env vars for config
+
+**Docker Network vs Host:**
+- Bridge network: Isolated, DNS resolution
+- Host network: Direct access, no isolation
+- **Choice:** Bridge for security
+
+**Volumes vs Bind Mounts:**
+- Named volumes: Docker-managed, portable
+- Bind mounts: Direct host path
+- **Choice:** Named volumes with bind options
+
+---
 
 ## Resources
 
-### Documentation
-- [Docker](https://docs.docker.com/)
+- [Docker Documentation](https://docs.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- [NGINX](https://nginx.org/en/docs/)
-- [WordPress](https://wordpress.org/documentation/)
-- [MariaDB](https://mariadb.com/kb/en/documentation/)
+- [NGINX](https://nginx.org/)
+- [WordPress](https://wordpress.org/)
+- [MariaDB](https://mariadb.com/)
 
-### AI Usage
-AI tools used for:
-- Docker configuration syntax
-- NGINX SSL/TLS setup
-- Documentation structure
-
-## Project Description
-
-### Services
-- **NGINX**: Web server with TLSv1.2/1.3, port 443 only
-- **WordPress**: PHP-FPM (no web server)
-- **MariaDB**: Database server
-
-### Docker Concepts
-
-**Virtual Machines vs Docker**
-- VMs: Full OS, hardware isolation, heavy
-- Docker: Shared kernel, process isolation, lightweight
-- Choice: Docker for efficiency
-
-**Secrets vs Environment Variables**
-- Secrets: Encrypted, secure (requires Swarm)
-- Env vars: Simple, visible in logs
-- Choice: Environment variables (development)
-
-**Docker Network vs Host Network**
-- Bridge: Isolated, DNS resolution
-- Host: Direct access, no isolation
-- Choice: Bridge for security
-
-**Docker Volumes vs Bind Mounts**
-- Volumes: Docker-managed, portable
-- Bind mounts: Direct host path
-- Choice: Named volumes with bind options (for `/home/login/data/` requirement)
+**AI Usage:** Used for configuration syntax, SSL setup, and documentation structure.

@@ -1,46 +1,36 @@
 # User Documentation
 
-## Start/Stop
+## Quick Start
 
-**Start:**
+### Start Services
 ```bash
-make build
+make
 ```
 
-**Stop:**
-```bash
-make down
-```
+### Access Website
+- URL: https://nde-vant.42.fr
+- Admin: https://nde-vant.42.fr/wp-admin
 
-## Access
+(Accept browser security warning for self-signed certificate)
 
-- Website: https://localhost
-- Admin: https://localhost/wp-admin
+---
 
-## Setup
+## Setup WordPress
 
-### 1. Add Domain (Optional)
-Add to hosts file:
-```
-127.0.0.1 nde-vant.42.fr
-```
+1. Visit https://nde-vant.42.fr
+2. Select language
+3. Create admin user (username cannot be "admin" or "administrator")
+4. Login and create second user (Users → Add New)
 
-**Location:**
-- Windows: `C:\Windows\System32\drivers\etc\hosts`
-- Linux/Mac: `/etc/hosts`
+---
 
-### 2. Install WordPress
-1. Visit https://localhost
-2. Follow wizard
-3. Create admin (not "admin")
-4. Users → Add New (create second user)
-
-## Manage
+## Manage Services
 
 ### Check Status
 ```bash
 docker ps
 ```
+All three containers should show "Up"
 
 ### View Logs
 ```bash
@@ -49,23 +39,30 @@ docker logs wordpress
 docker logs mariadb
 ```
 
-### Credentials
-Location: `srcs/.env`
-
-### Restart
+### Stop Services
 ```bash
-make restart
+make down
 ```
+
+### Restart Services
+```bash
+make re
+```
+
+---
 
 ## Troubleshooting
 
-**Containers not running:**
+**Site not accessible:**
 ```bash
-docker ps -a
-docker logs <container>
-make restart
+docker ps              # Check containers are running
+docker logs nginx      # Check for errors
+make re                # Rebuild
 ```
 
-**Cannot access site:**
-- Check: `docker ps`
-- Try: https://localhost
+**Forgot admin password:**
+Access database and reset via WordPress admin panel, or rebuild:
+```bash
+make fclean
+make
+```
