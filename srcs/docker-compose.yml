@@ -1,18 +1,19 @@
 services:
-  web:
+  nginx:
     build: requirements/nginx/
     image: inception-nginx:1.0
     container_name: nginx
     ports:
-      - "80:80"
       - "443:443"
     volumes:
       - wordpress_vol:/var/www/html
     networks:
       - inception
     restart: always
+    depends_on:
+      - wordpress
 
-  db:
+  mariadb:
     build: requirements/mariadb/
     image: inception-mariadb:1.0
     container_name: mariadb
@@ -27,22 +28,27 @@ services:
       - inception
     restart: always
 
-  app:
+  wordpress:
     build: requirements/wordpress/
     image: inception-wordpress:1.0
     container_name: wordpress
     environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_HOST=mariadb
+      # Database connection (read from .env file)
+      - WORDPRESS_DB_HOST=mariadb
+      - WORDPRESS_DB_NAME=${MYSQL_DATABASE}
+      - WORDPRESS_DB_USER=${MYSQL_USER}
+      - WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
+      # WordPress configuration
+      - WORDPRESS_TABLE_PREFIX=wp_
+      - WORDPRESS_DEBUG=false
+      - WORDPRESS_URL="https://nde-vant.42.fr"
     volumes:
       - wordpress_vol:/var/www/html
     networks:
       - inception
     restart: always
     depends_on:
-      - db
+      - mariadb
 
 volumes:
   mariadb_vol:
