@@ -1,3 +1,4 @@
 test.txt
+srcs/.env
 secrets/*
 !secrets/.gitkeep
