@@ -29,15 +29,9 @@ if [ ! -f wp-config.php ]; then
         --allow-root
     
     # Create first additional user
-    wp user create $WORDPRESS_USER $WORDPRESS_USER_EMAIL \
+    wp user create "$WORDPRESS_USER" "$WORDPRESS_USER_EMAIL" \
         --role=author \
-        --user_pass="$(cat /tun/secrets/wp_user_password.txt)" \
-        --allow-root
-    
-    # Create second additional user
-    wp user create user2 user2@example.com \
-        --role=editor \
-        --user_pass="user2_password" \
+        --user_pass="$(cat run/secrets/wp_user_password.txt)" \
         --allow-root
 fi
 
