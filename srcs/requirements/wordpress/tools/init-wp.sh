@@ -1,28 +1,44 @@
 #!/bin/bash
 
-WORDPRESS_DB_PASSWORD=$(cat /run/secrets/db_password)
-
 echo "Waiting for MariaDB to be ready..."
 while ! mysqladmin ping -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" --silent; do
 	sleep 2
 done
 echo "MariaDB is ready!"
 
-if [ ! -f "/var/www/html/wp-config.php" ]; then
-cat > /var/www/html/wp-config.php <<EOF
-<?php
-define('DB_NAME', '$WORDPRESS_DB_NAME');
-define('DB_USER', '$WORDPRESS_DB_USER');
-define('DB_PASSWORD', '$WORDPRESS_DB_PASSWORD');
-define('DB_HOST', '$WORDPRESS_DB_HOST');
-define('DB_CHARSET', 'utf8');
-define('DB_COLLATE', '');
-\$table_prefix = 'wp_';
-define('WP_DEBUG', false);
-if ( !defined('ABSPATH') )
-	define('ABSPATH', dirname(__FILE__) . '/');
-require_once(ABSPATH . 'wp-settings.php');
-EOF
+cd /var/www/html
+
+if [ ! -f wp-config.php ]; then
+    wp core download --allow-root
+    
+    # Create wp-config
+    wp config create \
+        --dbname="$WORDPRESS_DB_NAME" \
+        --dbuser="$WORDPRESS_DB_USER" \
+        --dbpass="$(cat /run/secrets/db_password.txt)" \
+        --dbhost="$WORDPRESS_DB_HOST" \
+        --allow-root
+    
+    # Install WordPress
+    wp core install \
+        --url="$WORDPRESS_URL" \
+        --title="$WORDPRESS_TITLE" \
+        --admin_user="$WORDPRESS_ADMIN_USER" \
+        --admin_password="$(cat /run/secrets/wp_admin_password.txt)" \
+        --admin_email="$WORDPRESS_ADMIN_EMAIL" \
+        --allow-root
+    
+    # Create first additional user
+    wp user create $WORDPRESS_USER $WORDPRESS_USER_EMAIL \
+        --role=author \
+        --user_pass="$(cat /tun/secrets/wp_user_password.txt)" \
+        --allow-root
+    
+    # # Create second additional user
+    # wp user create user2 user2@example.com \
+    #     --role=editor \
+    #     --user_pass="user2_password" \
+    #     --allow-root
 fi
 
 chown -R www-data:www-data /var/www/html/

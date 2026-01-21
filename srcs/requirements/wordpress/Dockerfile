@@ -20,6 +20,12 @@ RUN wget https://wordpress.org/latest.tar.gz && \
 	cp -r wordpress/* /var/www/html/ && \
 	rm -rf latest.tar.gz wordpress
 RUN mkdir -p /run/php
+
+RUN wget -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+	chmod +x wp-cli.phar && \
+	mv wp-cli.phar /usr/local/bin/wp && \
+
+
 EXPOSE 9000
 
 COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
