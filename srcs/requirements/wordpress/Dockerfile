@@ -21,9 +21,9 @@ RUN wget https://wordpress.org/latest.tar.gz && \
 	rm -rf latest.tar.gz wordpress
 RUN mkdir -p /run/php
 
-RUN wget -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
-	chmod +x wp-cli.phar && \
-	mv wp-cli.phar /usr/local/bin/wp && \
+RUN wget -O wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x wp-cli.phar && \
+    mv wp-cli.phar /usr/local/bin/wp
 
 
 EXPOSE 9000
