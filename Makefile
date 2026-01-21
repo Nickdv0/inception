@@ -6,6 +6,9 @@ DOCKER_COMPOSE_FILE = ./srcs/docker-compose.yml
 
 .PHONY: kill build down clean restart
 
+up:
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d
+
 build:
 	mkdir -p /home/$(USER)/data/mysql
 	mkdir -p /home/$(USER)/data/wordpress
