@@ -1,6 +1,5 @@
 services:
   nginx:
-	hostname: nde-vant.42.fr
     build: requirements/nginx/
     image: inception-nginx:1.0
     container_name: nginx
