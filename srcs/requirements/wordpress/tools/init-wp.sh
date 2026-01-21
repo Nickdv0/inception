@@ -34,11 +34,11 @@ if [ ! -f wp-config.php ]; then
         --user_pass="$(cat /tun/secrets/wp_user_password.txt)" \
         --allow-root
     
-    # # Create second additional user
-    # wp user create user2 user2@example.com \
-    #     --role=editor \
-    #     --user_pass="user2_password" \
-    #     --allow-root
+    # Create second additional user
+    wp user create user2 user2@example.com \
+        --role=editor \
+        --user_pass="user2_password" \
+        --allow-root
 fi
 
 chown -R www-data:www-data /var/www/html/
