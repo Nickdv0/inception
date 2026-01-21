@@ -27,18 +27,6 @@ make down
 
 ---
 
-## Requirements Met
-
-- ✅ NGINX with TLSv1.2/1.3 only (port 443)
-- ✅ WordPress + PHP-FPM (no NGINX in container)
-- ✅ MariaDB (separate container)
-- ✅ Two volumes (database, WordPress files)
-- ✅ Docker network for container communication
-- ✅ Auto-restart on crash
-- ✅ Custom Dockerfiles (no pre-built images)
-- ✅ Environment variables (no hardcoded passwords)
-
----
 
 ## Architecture
 

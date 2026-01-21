@@ -9,7 +9,7 @@ echo "MariaDB is ready!"
 cd /var/www/html
 
 if [ ! -f wp-config.php ]; then
-    wp core download --allow-root
+    echo "Setting up WordPress..."
     
     # Create wp-config
     wp config create \
