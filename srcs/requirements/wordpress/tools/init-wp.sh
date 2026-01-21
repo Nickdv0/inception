@@ -1,5 +1,7 @@
 #!/bin/bash
 
+WORDPRESS_DB_PASSWORD=$(cat /run/secrets/db_password.txt)
+
 echo "Waiting for MariaDB to be ready..."
 while ! mysqladmin ping -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" --silent; do
 	sleep 2
@@ -15,7 +17,7 @@ if [ ! -f wp-config.php ]; then
     wp config create \
         --dbname="$WORDPRESS_DB_NAME" \
         --dbuser="$WORDPRESS_DB_USER" \
-        --dbpass="$(cat /run/secrets/db_password.txt)" \
+        --dbpass="$WORDPRESS_DB_PASSWORD" \
         --dbhost="$WORDPRESS_DB_HOST" \
         --allow-root
     
@@ -31,7 +33,7 @@ if [ ! -f wp-config.php ]; then
     # Create first additional user
     wp user create "$WORDPRESS_USER" "$WORDPRESS_USER_EMAIL" \
         --role=author \
-        --user_pass="$(cat run/secrets/wp_user_password.txt)" \
+        --user_pass="$(cat /run/secrets/wp_user_password.txt)" \
         --allow-root
 fi
 
