@@ -4,7 +4,7 @@
 
 ### Prerequisites
 - Docker and Docker Compose installed
-- Ports 8443 available
+- Ports 443 available
 - (Optional) Add domain to /etc/hosts
 
 ### Start Services
@@ -35,11 +35,6 @@ WordPress is automatically configured on first run with:
 
 **Passwords:**
 Check `secrets/wp_admin_password.txt` and `secrets/wp_user_password.txt`
-
-**Manual User Management:**
-1. Login as admin
-2. Go to Users → Add New
-3. Create additional users as needed
 
 ---
 
@@ -82,7 +77,7 @@ make fclean    # Clean volumes + remove images
 ```bash
 docker ps                    # Check containers are running
 docker logs nginx            # Check for errors
-curl -k https://localhost:8443  # Test from command line
+curl -k https://localhost:443  # Test from command line
 make re                      # Rebuild if needed
 ```
 

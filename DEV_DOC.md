@@ -29,17 +29,17 @@ make
 ## Architecture
 
 **3 Containers:**
-- NGINX (443 internal, 8443 external) → WordPress (9000) → MariaDB (3306)
+- NGINX (443 internal, 443 external) → WordPress (9000) → MariaDB (3306)
 - Network: inception (bridge)
 - Volumes: ~/data/mysql, ~/data/wordpress
 
 **Data Flow:**
 ```
-User → NGINX (HTTPS:8443) → WordPress (FastCGI:9000) → MariaDB (MySQL:3306)
+User → NGINX (HTTPS:443) → WordPress (FastCGI:9000) → MariaDB (MySQL:3306)
 ```
 
 **Secrets Management:**
-- Mounted in `/run/secrets/` (without .txt extension)
+- Mounted in `/run/secrets/`
 - Not visible in `docker inspect`
 - Loaded at runtime by init scripts
 
@@ -81,8 +81,8 @@ docker exec -it wordpress bash      # WordPress shell
 ### Check Status
 ```bash
 docker ps                                  # All should be "Up"
-curl -k https://localhost:8443             # Test website
-curl -k https://localhost:8443/wp-admin/   # Test admin
+curl -k https://localhost:443             # Test website
+curl -k https://localhost:443/wp-admin/   # Test admin
 ```
 
 ### Verify Requirements
