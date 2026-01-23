@@ -2,25 +2,44 @@
 
 ## Quick Start
 
+### Prerequisites
+- Docker and Docker Compose installed
+- Ports 8443 available
+- (Optional) Add domain to /etc/hosts
+
 ### Start Services
 ```bash
 make
 ```
 
 ### Access Website
-- URL: https://nde-vant.42.fr
-- Admin: https://nde-vant.42.fr/wp-admin
+- **With domain:** https://nde-vant.42.fr:443
+- **Without domain:** https://localhost:443
+- **Admin panel:** Add `/wp-admin` to either URL
+
+**Add domain (optional):**
+```bash
+echo "127.0.0.1   nde-vant.42.fr" | sudo tee -a /etc/hosts
+```
 
 (Accept browser security warning for self-signed certificate)
 
 ---
 
-## Setup WordPress
+## WordPress Setup
 
-1. Visit https://nde-vant.42.fr
-2. Select language
-3. Create admin user (username cannot be "admin" or "administrator")
-4. Login and create second user (Users → Add New)
+**Automatic Setup:**
+WordPress is automatically configured on first run with:
+- Admin user: `nde-vant` (Administrator role)
+- Additional user: `regular_user` (Author role)
+
+**Passwords:**
+Check `secrets/wp_admin_password.txt` and `secrets/wp_user_password.txt`
+
+**Manual User Management:**
+1. Login as admin
+2. Go to Users → Add New
+3. Create additional users as needed
 
 ---
 
@@ -30,13 +49,13 @@ make
 ```bash
 docker ps
 ```
-All three containers should show "Up"
+All three containers should show "Up": nginx, wordpress, mariadb
 
 ### View Logs
 ```bash
-docker logs nginx
-docker logs wordpress
-docker logs mariadb
+docker logs nginx       # Web server logs
+docker logs wordpress   # PHP-FPM and WP-CLI logs
+docker logs mariadb     # Database initialization logs
 ```
 
 ### Stop Services
@@ -49,20 +68,48 @@ make down
 make re
 ```
 
+### Clean Volumes
+```bash
+make clean     # Clean data volumes only
+make fclean    # Clean volumes + remove images
+```
+
 ---
 
 ## Troubleshooting
 
 **Site not accessible:**
 ```bash
-docker ps              # Check containers are running
-docker logs nginx      # Check for errors
-make re                # Rebuild
+docker ps                    # Check containers are running
+docker logs nginx            # Check for errors
+curl -k https://localhost:8443  # Test from command line
+make re                      # Rebuild if needed
 ```
 
-**Forgot admin password:**
-Access database and reset via WordPress admin panel, or rebuild:
+**WordPress not installed:**
 ```bash
-make fclean
-make
+docker logs wordpress        # Check initialization logs
+docker exec wordpress wp user list --path=/var/www/html --allow-root  # Verify users
 ```
+
+**Database connection issues:**
+```bash
+docker logs mariadb          # Check database logs
+docker exec mariadb mysql -u wpuser -p"$(cat secrets/db_password.txt)" -e "SHOW DATABASES;"
+```
+
+**Reset everything:**
+```bash
+make fclean    # Remove all data and images
+make           # Rebuild from scratch
+```
+
+---
+
+## Data Persistence
+
+Data is stored in:
+- WordPress files: `~/data/wordpress/`
+- Database files: `~/data/mysql/`
+
+These directories persist between container restarts.

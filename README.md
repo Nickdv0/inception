@@ -18,11 +18,23 @@ make
 ```
 
 ### Access
-https://nde-vant.42.fr (or https://localhost)
+- **With domain:** https://nde-vant.42.fr:443 (requires `/etc/hosts` entry)
+- **Without domain:** https://localhost:443
+
+**Add to /etc/hosts (optional):**
+```bash
+echo "127.0.0.1   nde-vant.42.fr" | sudo tee -a /etc/hosts
+```
 
 ### Stop
 ```bash
 make down
+```
+
+### Clean and Rebuild
+```bash
+make clean    # Clean volumes only
+make fclean   # Clean volumes + Docker images
 ```
 
 ---
@@ -49,6 +61,36 @@ make down
 - Named volumes: Docker-managed, portable
 - Bind mounts: Direct host path
 - **Choice:** Named volumes with bind options
+
+---
+
+## Services
+
+### NGINX (Port 8443)
+- SSL/TLS encryption (self-signed certificate)
+- Reverse proxy to WordPress PHP-FPM
+- Static file serving
+
+### WordPress
+- WP-CLI for automated setup
+- PHP-FPM 7.4
+- Auto-creates admin + additional user
+- Persisted in volume
+
+### MariaDB
+- Isolated database service
+- Secure with secrets management
+- Auto-initialization script
+- Persisted in volume
+
+---
+
+## Credentials
+
+Admin user: `nde-vant` (Administrator)
+Regular user: `regular_user` (Author)
+
+Passwords stored in `secrets/` directory.
 
 ---
 
