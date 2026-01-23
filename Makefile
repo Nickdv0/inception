@@ -20,11 +20,13 @@ kill:
 down:
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down
 
-clean:
-	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down -v
+clean: down
+	@echo "Cleaning volumes..."
+	@sudo rm -rf /home/$(USER)/data/wordpress/* /home/$(USER)/data/mysql/*
 
 fclean: clean
-	docker run --rm -v /home/$(USER)/data:/data debian rm -rf /data/mysql /data/wordpress
+	@echo "Removing Docker images and system cleanup..."
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down -v
 	docker system prune -a -f
 
 re: clean build
