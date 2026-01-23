@@ -4,7 +4,7 @@ services:
     image: inception-nginx:1.0
     container_name: nginx
     ports:
-      - "443:443"
+      - "8443:443"
     volumes:
       - wordpress_vol:/var/www/html
     networks:
@@ -48,7 +48,7 @@ services:
       - WORDPRESS_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
       - WORDPRESS_USER=${WP_USER}
       - WORDPRESS_USER_EMAIL=${WP_USER_EMAIL}
-      - WORDPRESS_URL=https://nde-vant.42.fr
+      - WORDPRESS_URL=https://localhost:8443
 
 
     volumes:
