@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd /var/www/html || exit 1
-
 WORDPRESS_DB_PASSWORD=$(cat /run/secrets/db_password.txt)
 
 echo "Waiting for MariaDB to be ready..."
@@ -9,6 +7,13 @@ while ! mysqladmin ping -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPR
 	sleep 2
 done
 echo "MariaDB is ready!"
+
+# Copy WordPress files to volume if they don't exist
+if [ ! -f /var/www/html/index.php ]; then
+    echo "Copying WordPress files to volume..."
+    cp -rp /tmp/wordpress/* /var/www/html/
+    chown -R www-data:www-data /var/www/html
+fi
 
 cd /var/www/html
 
@@ -23,6 +28,7 @@ if [ ! -f wp-config.php ]; then
         --dbhost="$WORDPRESS_DB_HOST" \
         --allow-root
     
+    echo "Installing WordPress core..."
     # Install WordPress
     wp core install \
         --url="$WORDPRESS_URL" \
@@ -32,14 +38,18 @@ if [ ! -f wp-config.php ]; then
         --admin_email="$WORDPRESS_ADMIN_EMAIL" \
         --allow-root
     
-    # Create first additional user
+    echo "Creating additional user..."
+    # Create additional user
     wp user create "$WORDPRESS_USER" "$WORDPRESS_USER_EMAIL" \
         --role=author \
         --user_pass="$(cat /run/secrets/wp_user_password.txt)" \
         --allow-root
+    
+    echo "WordPress setup complete!"
 fi
 
-chown -R www-data:www-data /var/www/html/
-chmod -R 755 /var/www/html/
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
 
+echo "Starting PHP-FPM..."
 exec php-fpm7.4 -F
