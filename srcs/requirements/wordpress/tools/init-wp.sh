@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WORDPRESS_DB_PASSWORD=$(cat /run/secrets/db_password.txt)
+WORDPRESS_DB_PASSWORD=$(cat /run/secrets/db_password)
 
 echo "Waiting for MariaDB to be ready..."
 while ! mysqladmin ping -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" --silent; do
@@ -34,7 +34,7 @@ if [ ! -f wp-config.php ]; then
         --url="$WORDPRESS_URL" \
         --title="$WORDPRESS_TITLE" \
         --admin_user="$WORDPRESS_ADMIN_USER" \
-        --admin_password="$(cat /run/secrets/wp_admin_password.txt)" \
+        --admin_password="$(cat /run/secrets/wp_admin_password)" \
         --admin_email="$WORDPRESS_ADMIN_EMAIL" \
         --allow-root
     
@@ -42,7 +42,7 @@ if [ ! -f wp-config.php ]; then
     # Create additional user
     wp user create "$WORDPRESS_USER" "$WORDPRESS_USER_EMAIL" \
         --role=author \
-        --user_pass="$(cat /run/secrets/wp_user_password.txt)" \
+        --user_pass="$(cat /run/secrets/wp_user_password)" \
         --allow-root
     
     echo "WordPress setup complete!"

@@ -22,7 +22,7 @@ down:
 
 clean: down
 	@echo "Cleaning volumes..."
-	@sudo rm -rf /home/$(USER)/data/wordpress/* /home/$(USER)/data/mysql/*
+	@docker run --rm -v /home/$(USER)/data:/data debian:11 sh -c "rm -rf /data/mysql /data/wordpress && mkdir -p /data/mysql /data/wordpress"
 
 fclean: clean
 	@echo "Removing Docker images and system cleanup..."
