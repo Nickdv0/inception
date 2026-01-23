@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd /var/www/html || exit 1
+
 WORDPRESS_DB_PASSWORD=$(cat /run/secrets/db_password.txt)
 
 echo "Waiting for MariaDB to be ready..."
