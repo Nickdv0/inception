@@ -3,26 +3,24 @@
 WORDPRESS_DB_PASSWORD=$(cat /run/secrets/db_password)
 
 echo "Waiting for MariaDB to be ready..."
-# Wait for MariaDB to accept connections
+# Wait for MariaDB to accept connections AND have the database ready
 max_attempts=30
 attempt=0
 while [ $attempt -lt $max_attempts ]; do
-    if mysqladmin ping -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" --silent 2>/dev/null; then
-        echo "MariaDB is ready!"
+    # Check if we can actually connect AND query the database
+    if mysql -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" -e "SELECT 1;" >/dev/null 2>&1; then
+        echo "MariaDB is ready and database is accessible!"
         break
     fi
     attempt=$((attempt + 1))
     echo "Waiting for MariaDB... (attempt $attempt/$max_attempts)"
-    sleep 2
+    sleep 3
 done
 
 if [ $attempt -eq $max_attempts ]; then
-    echo "ERROR: Could not connect to MariaDB after $max_attempts attempts"
+    echo "ERROR: Could not connect to MariaDB database after $max_attempts attempts"
     exit 1
 fi
-
-# Give MariaDB a bit more time to fully initialize
-sleep 3
 
 # Copy WordPress files to volume if they don't exist
 if [ ! -f /var/www/html/index.php ]; then
@@ -40,6 +38,14 @@ if [ ! -f wp-config.php ]; then
     max_retries=5
     retry=0
     while [ $retry -lt $max_retries ]; do
+        # Test database connection first
+        if ! mysql -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" -e "SELECT 1;" >/dev/null 2>&1; then
+            echo "Database connection test failed, retrying... ($((retry + 1))/$max_retries)"
+            retry=$((retry + 1))
+            sleep 3
+            continue
+        fi
+        
         if wp config create \
             --dbname="$WORDPRESS_DB_NAME" \
             --dbuser="$WORDPRESS_DB_USER" \
