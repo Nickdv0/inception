@@ -32,6 +32,8 @@ services:
   wordpress:
     secrets:
       - db_password
+      - wp_admin_password
+      - wp_user_password
     build: requirements/wordpress/
     image: inception-wordpress:1.0
     container_name: wordpress
