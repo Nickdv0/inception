@@ -4,7 +4,7 @@ services:
     image: inception-nginx:1.0
     container_name: nginx
     ports:
-      - "8443:443"
+      - "443:443"
     volumes:
       - wordpress_vol:/var/www/html
     networks:
